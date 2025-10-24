@@ -1,65 +1,113 @@
 #include <stdio.h>
 #include <stdlib.h>
+#define LIST_GROWTH 2
 typedef struct
 {
     int count;
     int capacity;
-    int inside_array[];
+    int *inside_array;
 } dynamic_array;
 
 dynamic_array *create_array(int capacity)
 {
-    dynamic_array *arr = malloc(sizeof(dynamic_array) + sizeof(int) * capacity);
-    if (!arr)
+
+    if (capacity < 0)
+    {
+        printf("erro: capacidade deve ser maior que zero\n");
         return NULL;
-
-    arr->count = 0;
-    arr->capacity = capacity;
-    return arr;
-}
-
-void add_last(dynamic_array *d, int value)
-{
-    if (d->count >= d->capacity)
-    {
-        d = realloc(d, sizeof(dynamic_array) + sizeof(int) * d->capacity * 2);
-        d->capacity *= 2;
-        d->inside_array[d->count] = value;
-        d->count++;
     }
-    else
+    // aloca memoria para a lista e o array interno
+    dynamic_array *list = malloc(sizeof(dynamic_array));
+    if (!list)
     {
-        d->inside_array[d->count] = value;
-        d->count++;
+        printf("erro na alocacao\n");
+        return NULL;
     }
+    // inicia campos
+    list->inside_array = malloc(sizeof(int) * capacity);
+    list->count = 0;
+    list->capacity = capacity;
+    return list;
 }
-void remove_last(dynamic_array *d)
+dynamic_array *add_last(dynamic_array *list, int value)
 {
-    if (d->count > 0)
-    {
-        d->count--;
-    }
-}
 
-void da_destroy(dynamic_array *d)
+    if (list->count >= list->capacity)
+    {
+    
+        if (list->capacity == 0)
+        {
+            list->capacity = 1;
+        }
+        else
+        {
+            list->capacity *= LIST_GROWTH;
+        }
+
+        list->inside_array = realloc(list->inside_array, sizeof(int) * list->capacity);
+        if (!list->inside_array)
+        {
+            printf("erro realoc\n");
+            return NULL;
+        }
+    }
+
+    list->inside_array[list->count] = value;
+    list->count++;
+
+    return list;
+}
+void remove_last(dynamic_array *list)
 {
-    free(d);
+    if (list->count > 0)
+    {
+        list->count--;
+    }
+}
+int get_capacity(dynamic_array *list)
+{
+    return list->capacity;
+}
+int get_count(dynamic_array *list)
+{
+    return list->count;
+}
+const int *get(dynamic_array *list, int index)
+{
+    if (index >= list->count || index < 0)
+    {
+        return NULL;
+    }
+
+    return &list->inside_array[index];
+}
+// limpa lista e array interno
+void free_list(dynamic_array *list)
+{
+    free(list->inside_array);
+    free(list);
+    list = NULL;
 }
 int main()
 {
-    dynamic_array *a = create_array(2);
+    dynamic_array *a = create_array(1);
 
-    for (int i = 0; i < 10; i++)
+    if (a != NULL)
     {
-        add_last(a, i);
-    }
-    remove_last(a);
-    
-    // printa de 0 a 8
-    for (int i = 0; i < a->count; i++)
-    {
-        printf("%d\n", a->inside_array[i]);
-    }
+        for (int i = 0; i <= 10; i++)
+        {
+            a = add_last(a, i);
+        }
+        // remove 10
+        remove_last(a);
 
-    da_destroy(a);
+        // printa de 0 a 9
+        for (int i = 0; i < a->count; i++)
+        {
+            int x = *get(a, i);
+            printf("%d\n", x);
+        }
+
+        free_list(a);
+    }
 }
