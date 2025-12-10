@@ -67,6 +67,13 @@ node *insert_last(linked_list *l, node *n)
     return insert_at(n, l->root.prev);
 }
 
+node *remove_first(linked_list *l, node *n)
+{
+}
+node *remove_last(linked_list *l, node *n)
+{
+}
+
 // criar uma lista vazia
 linked_list *create_l_list()
 {
@@ -151,15 +158,18 @@ int main()
     insert_last(l, create_node(10));
     insert_last(l, create_node(20));
     insert_last(l, create_node(5));
+    insert_first(l, create_node(2));
     insert_first(l, create_node(1));
 
     printf("Tamanho: %d\n", get_l_len(l));
 
-   // remove 1
+    // remove 1
     remove_node(get_first(l));
-    print_list(l); 
-    
+    print_list(l);
+
     printf("Tamanho: %d\n", get_l_len(l));
+
+    printf("%d\n", get_last(l)->data);
 
     free_list(l);
     return 0;
